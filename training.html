@@ -110,10 +110,13 @@
   .bottom-bar {
     position: absolute; bottom: 0; left: 0; right: 0;
     padding: 10px; z-index: 10; pointer-events: none;
-    display: flex; justify-content: space-between; align-items: flex-end;
   }
   .pause-btn {
     pointer-events: auto;
+    width: 100%;
+    padding: 24px;
+    font-size: 1.5rem;
+    font-weight: 800;
   }
   .pause-btn.paused {
     background: rgba(39,174,96,0.9) !important;
@@ -130,7 +133,7 @@
   }
 
   .exercise-name {
-    font-size: clamp(2.2rem, 9vw, 4.5rem);
+    font-size: clamp(2.75rem, 11.25vw, 5.625rem);
     font-weight: 800;
     line-height: 1.1;
     margin-bottom: 12px;
@@ -138,7 +141,7 @@
   }
 
   .exercise-main-value {
-    font-size: clamp(7rem, 38vw, 18rem);
+    font-size: clamp(8.75rem, 47.5vw, 22.5rem);
     font-weight: 900;
     line-height: 1;
     letter-spacing: -3px;
@@ -146,13 +149,13 @@
   }
 
   .exercise-sub {
-    font-size: clamp(1.5rem, 5.5vw, 2.8rem);
+    font-size: clamp(1.875rem, 6.875vw, 3.5rem);
     opacity: 0.7;
     margin-top: 8px;
   }
 
   .exercise-rep-info {
-    font-size: clamp(1.2rem, 4vw, 2rem);
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
     opacity: 0.5;
     margin-top: 4px;
   }
@@ -160,7 +163,7 @@
   .confirm-btn {
     background: var(--green);
     color: #fff; border: none; border-radius: 16px;
-    padding: 20px 48px; font-size: clamp(1.3rem, 5vw, 2rem);
+    padding: 20px 48px; font-size: clamp(1.625rem, 6.25vw, 2.5rem);
     font-weight: 800; cursor: pointer;
     margin-top: 20px;
     animation: pulse 1.5s infinite;
@@ -674,7 +677,7 @@ function runExercise() {
   $exSub.textContent = '';
   $exRepInfo.textContent = '';
   $confirmBtn.style.display = 'none';
-  $exContent.style.background = hexToRgba(ex.color, 0.2);
+  $exContent.style.background = hexToRgba(ex.color, 0.8);
   $progressBar.style.width = `${((currentIndex) / flatExercises.length) * 100}%`;
 
   // Loop info
