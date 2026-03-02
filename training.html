@@ -764,6 +764,7 @@ function startTimeExercise(ex) {
 }
 
 // ── REPS exercise ──
+// repTime=8 → shows 8,7,6,5,4,3,2,1 → next rep (exactly 8 seconds)
 function startRepsExercise(ex) {
   currentRep = 1;
   currentTime = ex.value.repTime;
@@ -775,7 +776,7 @@ function startRepsExercise(ex) {
     if (isPaused) return;
     currentTime--;
 
-    if (currentTime < 0) {
+    if (currentTime <= 0) {
       if (currentRep >= ex.value.count) {
         // Done all reps
         clearInterval(timer);
@@ -794,8 +795,8 @@ function startRepsExercise(ex) {
       currentTime = ex.value.repTime;
       if (ex.beep) beepRepTick(true);
     } else {
-      // Mid-rep tick (not on the first tick of the rep, that was handled above)
-      if (ex.beep && currentTime < ex.value.repTime) beepRepTick(false);
+      // Mid-rep soft tick
+      if (ex.beep) beepRepTick(false);
     }
 
     updateRepsUI(ex);
@@ -803,8 +804,7 @@ function startRepsExercise(ex) {
 }
 
 function updateRepsUI(ex) {
-  const display = currentTime < 0 ? 0 : currentTime;
-  $exMain.textContent = fmtTime(display);
+  $exMain.textContent = fmtTime(currentTime);
   $exSub.textContent = `Rep ${currentRep} / ${ex.value.count}`;
 }
 
@@ -831,10 +831,8 @@ function confirmExercise() {
 
 function handleContentTap() {
   showBars();
-  if (isPaused) {
-    togglePause();
-    return;
-  }
+  // When paused, tap only shows bars — use the ▶ button to unpause
+  if (isPaused) return;
   if (waitingConfirm) {
     confirmExercise();
   }
@@ -888,16 +886,12 @@ function togglePause() {
 }
 
 function updatePauseUI() {
-  $btnPause.textContent = isPaused ? '▶' : '⏸';
+  $btnPause.textContent = isPaused ? '▶ Wznów' : '⏸';
   $btnPause.classList.toggle('paused', isPaused);
   $pauseOverlay.classList.toggle('visible', isPaused);
   $btnHoldExit.style.display = isPaused ? 'inline-block' : 'none';
-  if (isPaused) {
-    showBars();
-  } else {
-    showBars();
-    barsHideTimeout = setTimeout(() => hideBars(), BARS_HIDE_DELAY);
-  }
+  // showBars handles timeout logic based on isPaused
+  showBars();
 }
 
 // ── Hold to exit ──
