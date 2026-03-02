@@ -130,7 +130,7 @@
   }
 
   .exercise-name {
-    font-size: clamp(1.8rem, 7vw, 3.5rem);
+    font-size: clamp(2.2rem, 9vw, 4.5rem);
     font-weight: 800;
     line-height: 1.1;
     margin-bottom: 12px;
@@ -138,21 +138,21 @@
   }
 
   .exercise-main-value {
-    font-size: clamp(5rem, 28vw, 14rem);
+    font-size: clamp(7rem, 38vw, 18rem);
     font-weight: 900;
     line-height: 1;
-    letter-spacing: -2px;
+    letter-spacing: -3px;
     font-variant-numeric: tabular-nums;
   }
 
   .exercise-sub {
-    font-size: clamp(1.2rem, 4vw, 2rem);
+    font-size: clamp(1.5rem, 5.5vw, 2.8rem);
     opacity: 0.7;
     margin-top: 8px;
   }
 
   .exercise-rep-info {
-    font-size: clamp(1rem, 3vw, 1.6rem);
+    font-size: clamp(1.2rem, 4vw, 2rem);
     opacity: 0.5;
     margin-top: 4px;
   }
@@ -265,7 +265,14 @@ const C_EX   = "#e67e22";
 const C_REST = "#2980b9";
 
 // Helpery do budowania rutyn
-function prep(name, sec)  { return { name: `Przygotuj: ${name}`, tts: `Przygotuj. ${name}`, type: "time", value: sec || 15, color: C_PREP }; }
+function prep(name, sec)  {
+  const isShort = (sec && sec <= 10);
+  return {
+    name: isShort ? name : `Przygotuj: ${name}`,
+    tts: isShort ? name : `Przygotuj. ${name}`,
+    type: "time", value: sec || 15, color: C_PREP
+  };
+}
 function rest(sec)   { return { name: "Odpoczynek", type: "time", value: sec, color: C_REST }; }
 function ex(name, type, value, opts) { return { name, type, value, color: C_EX, ...opts }; }
 
@@ -292,13 +299,13 @@ const ROUTINES = [
 
       { loop: 2, exercises: [
         prep("Pompki"),
-        ex("Pompki", "reps", { count: 10, repTime: 4 }),
+        ex("Pompki", "reps", { count: 10, repTime: 4 }, { confirm: true }),
         rest(45),
       ]},
 
       { loop: 5, exercises: [
         prep("Wiosłowanie"),
-        ex("Wiosłowanie", "reps", { count: 10, repTime: 4 }),
+        ex("Wiosłowanie", "reps", { count: 10, repTime: 4 }, { confirm: true }),
         rest(45),
       ]},
 
@@ -374,7 +381,7 @@ const ROUTINES = [
       ]},
 
       prep("Rozciąganie"),
-      ex("Rozciąganie", "time", 300),
+      ex("Rozciąganie", "time", 300, { confirm: true }),
 
       prep("Wałkowanie łydek"),
       ex("Wałkowanie łydek", "time", 120),
@@ -426,6 +433,27 @@ const ROUTINES = [
       ex("Siad", "time", 120),
     ]
   },
+
+  {
+    name: "Airbike 4×4",
+    exercises: [
+      // Rozgrzewka 4min
+      prep("Rozgrzewka na airbike"),
+      ex("Rozgrzewka", "time", 240),
+
+      // 4 rundy: 4min szybko + 4min wolno
+      { loop: 4, exercises: [
+        prep("Szybko – max wysiłek!", 5),
+        ex("Airbike – szybko", "time", 240, { color: "#c0392b" }),
+        prep("Wolno – aktywny odpoczynek", 5),
+        ex("Airbike – wolno", "time", 240, { color: "#2980b9" }),
+      ]},
+
+      // Cooldown 4min
+      prep("Cooldown"),
+      ex("Cooldown", "time", 240, { color: "#27ae60" }),
+    ]
+  },
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -473,7 +501,7 @@ function getAudioCtx() {
   return audioCtx;
 }
 
-function beep(freq = 800, duration = 150) {
+function beep(freq = 800, duration = 150, vol = 0.3) {
   try {
     const ctx = getAudioCtx();
     const osc = ctx.createOscillator();
@@ -481,23 +509,34 @@ function beep(freq = 800, duration = 150) {
     osc.connect(gain);
     gain.connect(ctx.destination);
     osc.frequency.value = freq;
-    gain.gain.value = 0.3;
+    gain.gain.value = vol;
     osc.start();
     osc.stop(ctx.currentTime + duration / 1000);
   } catch(e) {}
 }
 
 function beepFinal() {
-  beep(1200, 400);
+  beep(1200, 400, 0.35);
 }
 
 function beepCountdown() {
-  beep(600, 120);
+  beep(600, 120, 0.3);
   // Flash
   const el = document.getElementById('exContent');
   el.classList.remove('beep-flash');
   void el.offsetWidth;
   el.classList.add('beep-flash');
+}
+
+// Rep phase beep: strong on first tick of rep, soft on all others
+function beepRepTick(isStart) {
+  if (isStart) {
+    // Strong tick – rep start
+    beep(700, 100, 0.22);
+  } else {
+    // Soft tick
+    beep(500, 50, 0.07);
+  }
 }
 
 // ── TTS ──
@@ -690,14 +729,14 @@ function startRepsExercise(ex) {
   currentRep = 1;
   currentTime = ex.value.repTime;
   updateRepsUI(ex);
+  // Initial strong beep for first rep
+  if (ex.beep) beepRepTick(true);
 
   timer = setInterval(() => {
     if (isPaused) return;
     currentTime--;
 
-    if (ex.beep && currentTime <= 3 && currentTime > 0) beepCountdown();
-
-    if (currentTime <= 0) {
+    if (currentTime < 0) {
       if (currentRep >= ex.value.count) {
         // Done all reps
         clearInterval(timer);
@@ -712,9 +751,12 @@ function startRepsExercise(ex) {
         return;
       }
       // Next rep
-      beep(900, 100);
       currentRep++;
       currentTime = ex.value.repTime;
+      if (ex.beep) beepRepTick(true);
+    } else {
+      // Mid-rep tick (not on the first tick of the rep, that was handled above)
+      if (ex.beep && currentTime < ex.value.repTime) beepRepTick(false);
     }
 
     updateRepsUI(ex);
@@ -722,13 +764,9 @@ function startRepsExercise(ex) {
 }
 
 function updateRepsUI(ex) {
-  $exMain.textContent = fmtTime(currentTime);
+  const display = currentTime < 0 ? 0 : currentTime;
+  $exMain.textContent = fmtTime(display);
   $exSub.textContent = `Rep ${currentRep} / ${ex.value.count}`;
-
-  // Beep on last 3 reps (when starting a new rep at the boundary)
-  if (ex.beep && currentRep > ex.value.count - 3 && currentTime === ex.value.repTime && currentRep > 1) {
-    // Visual cue for last reps
-  }
 }
 
 // ── STATIC exercise ──
@@ -907,6 +945,23 @@ startRoutine = function(idx) {
   requestWakeLock();
   origStartRoutine(idx);
 };
+
+// ── Block refresh / back while routine is running ──
+function isRoutineActive() {
+  return $exScreen.style.display === 'flex';
+}
+window.addEventListener('beforeunload', (e) => {
+  if (isRoutineActive()) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+history.pushState(null, '', location.href);
+window.addEventListener('popstate', () => {
+  if (isRoutineActive()) {
+    history.pushState(null, '', location.href);
+  }
+});
 
 // ── Init ──
 buildStartScreen();
