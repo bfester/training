@@ -123,6 +123,7 @@
     padding: 24px;
     font-size: 1.5rem;
     font-weight: 800;
+    color: #fff;
   }
   .pause-btn.paused {
     background: rgba(39,174,96,0.9) !important;
@@ -682,6 +683,11 @@ function startRoutine(idx) {
   // Unlock audio context on user interaction
   try { getAudioCtx().resume(); } catch(e) {}
 
+  // Fullscreen on mobile
+  if (document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  }
+
   flatExercises = flattenExercises(ROUTINES[idx].exercises);
   currentIndex = 0;
   isPaused = false;
@@ -824,8 +830,11 @@ function confirmExercise() {
 }
 
 function handleContentTap() {
-  // Tapping the content area also confirms if waiting
   showBars();
+  if (isPaused) {
+    togglePause();
+    return;
+  }
   if (waitingConfirm) {
     confirmExercise();
   }
