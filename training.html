@@ -604,6 +604,7 @@ function showBars() {
 }
 
 function hideBars() {
+  if (isPaused) return; // never hide when paused
   $topBar.classList.add('hidden');
   $bottomBar.classList.add('hidden');
 }
