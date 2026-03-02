@@ -55,6 +55,31 @@
     border-radius: 8px; padding: 10px 22px; font-size: 1.1rem;
     font-weight: 700; cursor: pointer; flex-shrink: 0;
   }
+  .routine-card .btn-show {
+    background: var(--btn); margin-right: 8px; padding: 8px 14px;
+    font-size: 0.9rem;
+  }
+  .routine-preview {
+    display: none; padding: 0 16px 12px;
+  }
+  .routine-preview.open {
+    display: block;
+  }
+  .routine-preview .rp-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 0.85rem;
+  }
+  .routine-preview .rp-item:last-child { border-bottom: none; }
+  .rp-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  }
+  .rp-name { flex: 1; }
+  .rp-value { opacity: 0.5; font-size: 0.78rem; white-space: nowrap; }
+  .rp-loop-header {
+    font-size: 0.78rem; opacity: 0.4; padding: 6px 0 2px;
+    font-weight: 700;
+  }
 
   /* ─── EXERCISE SCREEN ─── */
   #exerciseScreen {
@@ -240,61 +265,165 @@ const C_EX   = "#e67e22";
 const C_REST = "#2980b9";
 
 // Helpery do budowania rutyn
-function prep(name)  { return { name: `Przygotuj: ${name}`, tts: `Przygotuj. ${name}`, type: "time", value: 15, color: C_PREP }; }
+function prep(name, sec)  { return { name: `Przygotuj: ${name}`, tts: `Przygotuj. ${name}`, type: "time", value: sec || 15, color: C_PREP }; }
 function rest(sec)   { return { name: "Odpoczynek", type: "time", value: sec, color: C_REST }; }
+function ex(name, type, value, opts) { return { name, type, value, color: C_EX, ...opts }; }
 
 const ROUTINES = [
   {
     name: "Plecy",
     exercises: [
-      // 1x: rolowanie pleców 2min (bez odpoczynku)
       prep("Rolowanie pleców"),
-      { name: "Rolowanie pleców", type: "time", value: 120, color: C_EX },
+      ex("Rolowanie pleców", "time", 120),
 
-      // 2x: wspięcia na obie stopy zgięte nogi 30×4s + odpoczynek 45s
-      {
-        loop: 2,
-        exercises: [
-          prep("Wspięcia na obie stopy – zgięte nogi"),
-          { name: "Wspięcia – zgięte nogi", type: "reps", value: { count: 30, repTime: 4 }, color: C_EX },
-          rest(45),
-        ]
-      },
+      { loop: 2, exercises: [
+        prep("Wspięcia na palce – zgięte nogi"),
+        ex("Wspięcia na palce – zgięte nogi", "reps", { count: 30, repTime: 4 }),
+        rest(45),
+      ]},
 
-      // 3x: wspięcia proste nogi 30×6s + unoszenie palców 25×3s + odpoczynek 45s
-      {
-        loop: 3,
-        exercises: [
-          prep("Wspięcia na obie stopy – proste nogi"),
-          { name: "Wspięcia – proste nogi", type: "reps", value: { count: 30, repTime: 6 }, color: C_EX },
-          { name: "Unoszenie palców o ścianę", type: "reps", value: { count: 25, repTime: 3 }, color: C_EX },
-          rest(45),
-        ]
-      },
+      { loop: 3, exercises: [
+        prep("Wspięcia na palce – proste nogi"),
+        ex("Wspięcia na palce – proste nogi", "reps", { count: 30, repTime: 6 }),
+        prep("Unoszenie palców w oparciu o ścianę"),
+        ex("Unoszenie palców w oparciu o ścianę", "reps", { count: 25, repTime: 3 }),
+        rest(45),
+      ]},
 
-      // 2x: pompki 10×4s + odpoczynek 45s
-      {
-        loop: 2,
-        exercises: [
-          prep("Pompki"),
-          { name: "Pompki", type: "reps", value: { count: 10, repTime: 4 }, color: C_EX },
-          rest(45),
-        ]
-      },
+      { loop: 2, exercises: [
+        prep("Pompki"),
+        ex("Pompki", "reps", { count: 10, repTime: 4 }),
+        rest(45),
+      ]},
 
-      // 5x: Wiosłowanie 10×4s + odpoczynek 45s
-      {
-        loop: 5,
-        exercises: [
-          prep("Wiosłowanie"),
-          { name: "Wiosłowanie", type: "reps", value: { count: 10, repTime: 4 }, color: C_EX },
-          rest(45),
-        ]
-      },
+      { loop: 5, exercises: [
+        prep("Wiosłowanie"),
+        ex("Wiosłowanie", "reps", { count: 10, repTime: 4 }),
+        rest(45),
+      ]},
 
-      // 1x: siad 2min (bez odpoczynku)
       prep("Siad"),
-      { name: "Siad", type: "time", value: 120, color: C_EX },
+      ex("Siad", "time", 120),
+    ]
+  },
+
+  {
+    name: "Klatka",
+    exercises: [
+      prep("Rolowanie pleców"),
+      ex("Rolowanie pleców", "time", 120),
+
+      prep("Samolot – pierwsza noga"),
+      ex("Samolot – pierwsza noga", "time", 60),
+      prep("Zmień nogę", 5),
+      ex("Samolot – druga noga", "time", 60),
+
+      { loop: 3, exercises: [
+        prep("Split squat"),
+        ex("Split squat – pierwsza noga", "reps", { count: 15, repTime: 8 }),
+        prep("Zmień nogę", 5),
+        ex("Split squat – druga noga", "reps", { count: 15, repTime: 8 }),
+        rest(60),
+      ]},
+
+      prep("Ławka rzymska – isohold + ramiona"),
+      ex("Ławka rzymska prosto – isohold + unoszenie ramion", "time", 120),
+      rest(45),
+
+      { loop: 2, exercises: [
+        prep("Ławka rzymska prosto – skłony"),
+        ex("Ławka rzymska prosto – skłony", "reps", { count: 12, repTime: 6 }),
+        rest(45),
+      ]},
+
+      { loop: 2, exercises: [
+        prep("Ławka rzymska bokiem"),
+        ex("Ławka rzymska bokiem", "reps", { count: 12, repTime: 6 }),
+        rest(45),
+      ]},
+
+      { loop: 3, exercises: [
+        prep("Wyciskanie sztangi na ławce"),
+        ex("Wyciskanie sztangi na ławce", "reps", { count: 10, repTime: 4 }, { confirm: true }),
+        rest(90),
+      ]},
+
+      { loop: 3, exercises: [
+        prep("Zwisy"),
+        ex("Zwisy", "time", 30),
+        rest(90),
+      ]},
+
+      prep("Siad"),
+      ex("Siad", "time", 120),
+    ]
+  },
+
+  {
+    name: "Mobility",
+    exercises: [
+      prep("Rice bucket"),
+      ex("Rice bucket", "time", 300),
+
+      { loop: 2, exercises: [
+        prep("Otwieranie dłoni – pierwsza ręka"),
+        ex("Otwieranie dłoni ze sztangielką – pierwsza ręka", "reps", { count: 10, repTime: 9 }),
+        prep("Zmień rękę", 5),
+        ex("Otwieranie dłoni ze sztangielką – druga ręka", "reps", { count: 10, repTime: 9 }),
+        rest(45),
+      ]},
+
+      prep("Rozciąganie"),
+      ex("Rozciąganie", "time", 300),
+
+      prep("Wałkowanie łydek"),
+      ex("Wałkowanie łydek", "time", 120),
+
+      prep("Rolowanie pleców"),
+      ex("Rolowanie pleców", "time", 120),
+
+      { loop: 4, exercises: [
+        prep("Siad 90/90"),
+        ex("Siad 90/90 – unieś stopę", "time", 30),
+        ex("Siad 90/90 – kolano do góry", "time", 30),
+        ex("Połóż się – noga równolegle do podłogi", "time", 30),
+        prep("Zmień stronę", 5),
+      ]},
+
+      prep("Step down"),
+      ex("Step down – pierwsza noga", "reps", { count: 15, repTime: 4 }),
+      prep("Zmień nogę", 5),
+      ex("Step down – druga noga", "reps", { count: 15, repTime: 4 }),
+      rest(45),
+
+      { loop: 3, exercises: [
+        prep("Przysiady"),
+        ex("Przysiady", "reps", { count: 10, repTime: 4 }),
+        prep("Przejdź do psa z głową w dół", 15),
+        ex("Pies z głową w dół", "time", 45),
+        rest(45),
+      ]},
+
+      prep("Unoszenie nogi – zginacz biodra"),
+      ex("Unoszenie nogi z taśmą – zginacz biodra", "time", 120),
+
+      prep("Rozciąganie kanapowe"),
+      ex("Rozciąganie kanapowe", "time", 120),
+
+      prep("Rozciąganie pośladków o ścianę"),
+      ex("Rozciąganie pośladków w oparciu o ścianę", "time", 120),
+
+      prep("Rozciąganie nogi taśmą"),
+      ex("Rozciąganie nogi – taśma tylna", "time", 120),
+
+      prep("Naleśnik stojący – skłony"),
+      ex("Naleśnik stojący – skłony", "reps", { count: 10, repTime: 6 }),
+
+      prep("Naleśnik siedzący"),
+      ex("Naleśnik siedzący", "time", 120),
+
+      prep("Siad"),
+      ex("Siad", "time", 120),
     ]
   },
 ];
@@ -419,6 +548,9 @@ function buildStartScreen() {
       if (e.type === 'reps') return s + e.value.count * e.value.repTime;
       return s + 30; // estimate for static
     }, 0);
+
+    const wrapper = document.createElement('div');
+
     const card = document.createElement('div');
     card.className = 'routine-card';
     card.innerHTML = `
@@ -426,10 +558,53 @@ function buildStartScreen() {
         <div class="name">${r.name}</div>
         <div class="info">${flat.length} ćwiczeń · ~${Math.ceil(totalTime/60)} min</div>
       </div>
-      <button onclick="startRoutine(${i})">START</button>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button class="btn-show" onclick="togglePreview(this)">Pokaż</button>
+        <button onclick="startRoutine(${i})">START</button>
+      </div>
     `;
-    list.appendChild(card);
+    wrapper.appendChild(card);
+
+    const preview = document.createElement('div');
+    preview.className = 'routine-preview';
+    preview.innerHTML = buildRoutinePreview(r.exercises, 0);
+    wrapper.appendChild(preview);
+
+    list.appendChild(wrapper);
   });
+}
+
+function togglePreview(btn) {
+  const preview = btn.closest('.routine-card').nextElementSibling;
+  const isOpen = preview.classList.toggle('open');
+  btn.textContent = isOpen ? 'Ukryj' : 'Pokaż';
+}
+
+function buildRoutinePreview(exercises, depth) {
+  let html = '';
+  for (const item of exercises) {
+    if (item.loop) {
+      html += `<div class="rp-loop-header" style="padding-left:${depth*12}px">🔁 ×${item.loop}</div>`;
+      html += buildRoutinePreview(item.exercises, depth + 1);
+    } else {
+      const resolved = typeof item === 'function' ? item : item;
+      const color = resolved.color || C_EX;
+      let valStr = '';
+      if (resolved.type === 'time') {
+        valStr = fmtTime(resolved.value);
+      } else if (resolved.type === 'reps') {
+        valStr = `${resolved.value.count}×${resolved.value.repTime}s`;
+      } else if (resolved.type === 'static') {
+        valStr = `${resolved.value}×`;
+      }
+      html += `<div class="rp-item" style="padding-left:${depth*12}px">`;
+      html += `<span class="rp-dot" style="background:${color}"></span>`;
+      html += `<span class="rp-name">${resolved.name}</span>`;
+      html += `<span class="rp-value">${valStr}</span>`;
+      html += `</div>`;
+    }
+  }
+  return html;
 }
 
 // ── Start routine ──
