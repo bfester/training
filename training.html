@@ -93,6 +93,11 @@
     display: flex; justify-content: space-between; align-items: flex-start;
     padding: 8px 10px; position: absolute; top: 0; left: 0; right: 0;
     z-index: 10; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .top-bar.hidden, .bottom-bar.hidden {
+    opacity: 0;
+    pointer-events: none;
   }
   .top-bar button, .bottom-bar button {
     pointer-events: auto;
@@ -110,6 +115,7 @@
   .bottom-bar {
     position: absolute; bottom: 0; left: 0; right: 0;
     padding: 10px; z-index: 10; pointer-events: none;
+    transition: opacity 0.3s;
   }
   .pause-btn {
     pointer-events: auto;
@@ -578,6 +584,28 @@ const $btnHoldExit = document.getElementById('btnHoldExit');
 const $pauseOverlay = document.getElementById('pauseOverlay');
 const $loopIndicator = document.getElementById('loopIndicator');
 const $progressBar = document.getElementById('progressBar');
+const $topBar = document.querySelector('.top-bar');
+const $bottomBar = document.querySelector('.bottom-bar');
+
+// ── Auto-hide bars ──
+let barsHideTimeout = null;
+const BARS_HIDE_DELAY = 3000;
+
+function showBars() {
+  $topBar.classList.remove('hidden');
+  $bottomBar.classList.remove('hidden');
+  clearTimeout(barsHideTimeout);
+  if (!isPaused) {
+    barsHideTimeout = setTimeout(() => {
+      hideBars();
+    }, BARS_HIDE_DELAY);
+  }
+}
+
+function hideBars() {
+  $topBar.classList.add('hidden');
+  $bottomBar.classList.add('hidden');
+}
 
 // ── Build start screen ──
 function buildStartScreen() {
@@ -659,6 +687,7 @@ function startRoutine(idx) {
   isPaused = false;
   $startScreen.style.display = 'none';
   $exScreen.style.display = 'flex';
+  showBars();
   updatePauseUI();
   runExercise();
 }
@@ -668,6 +697,7 @@ function runExercise() {
   clearInterval(timer);
   waitingConfirm = false;
   exerciseStartedInteraction = false;
+  hideBars();
 
   const ex = flatExercises[currentIndex];
   if (!ex) { finishRoutine(); return; }
@@ -795,6 +825,7 @@ function confirmExercise() {
 
 function handleContentTap() {
   // Tapping the content area also confirms if waiting
+  showBars();
   if (waitingConfirm) {
     confirmExercise();
   }
@@ -811,12 +842,14 @@ function advanceExercise() {
 }
 
 function goNext() {
+  showBars();
   clearInterval(timer);
   beep(400, 60);
   advanceExercise();
 }
 
 function goPrev() {
+  showBars();
   clearInterval(timer);
   beep(400, 60);
 
@@ -837,6 +870,7 @@ function goPrev() {
 
 // ── Pause ──
 function togglePause() {
+  showBars();
   isPaused = !isPaused;
   updatePauseUI();
   if (!isPaused) {
@@ -849,6 +883,12 @@ function updatePauseUI() {
   $btnPause.classList.toggle('paused', isPaused);
   $pauseOverlay.classList.toggle('visible', isPaused);
   $btnHoldExit.style.display = isPaused ? 'inline-block' : 'none';
+  if (isPaused) {
+    showBars();
+  } else {
+    showBars();
+    barsHideTimeout = setTimeout(() => hideBars(), BARS_HIDE_DELAY);
+  }
 }
 
 // ── Hold to exit ──
@@ -884,10 +924,13 @@ function updatePauseUI() {
 
 function exitToStart() {
   clearInterval(timer);
+  clearTimeout(barsHideTimeout);
   isPaused = false;
   speechSynthesis.cancel();
   $exScreen.style.display = 'none';
   $startScreen.style.display = 'flex';
+  $topBar.classList.remove('hidden');
+  $bottomBar.classList.remove('hidden');
 }
 
 // ── Finish ──
