@@ -99,6 +99,9 @@
     opacity: 0;
     pointer-events: none;
   }
+  .top-bar.hidden button, .bottom-bar.hidden button {
+    pointer-events: none;
+  }
   .top-bar button, .bottom-bar button {
     pointer-events: auto;
     background: rgba(15,52,96,0.85); color: #fff; border: none;
@@ -276,14 +279,16 @@ const C_REST = "#2980b9";
 
 // Helpery do budowania rutyn
 function prep(name, sec)  {
-  const isShort = (sec && sec <= 10);
   return {
-    name: isShort ? name : `Przygotuj: ${name}`,
-    tts: isShort ? name : `Przygotuj. ${name}`,
+    name: `Przygotuj: ${name}`,
+    tts: `Przygotuj. ${name}`,
     type: "time", value: sec || 15, color: C_PREP
   };
 }
-function rest(sec)   { return { name: "Odpoczynek", type: "time", value: sec, color: C_REST }; }
+function change(name, sec) {
+  return { name, tts: name, type: "time", value: sec || 5, color: C_PREP };
+}
+function rest(sec)   { return { name: "Odpoczynek", type: "time", value: sec, color: C_REST, speakNext: true }; }
 function ex(name, type, value, opts) { return { name, type, value, color: C_EX, ...opts }; }
 
 const ROUTINES = [
@@ -308,14 +313,30 @@ const ROUTINES = [
       ]},
 
       { loop: 2, exercises: [
+        prep("Ławka rzymska isohold jedna noga"),
+        ex("Ławka rzymska isohold jedna noga - pierwsza noga", "time", 60),
+        change("Zmień nogę"),
+        ex("Ławka rzymska isohold jedna noga - druga noga", "time", 60),
+        rest(45),
+      ]},
+
+      { loop: 1, exercises: [
+        prep("Ławka rzymska bokiem"),
+        ex("Ławka rzymska bokiem - pierwsza strona", "reps", { count: 12, repTime: 6 }),
+        change("Zmień stronę"),
+        ex("Ławka rzymska bokiem - druga strona", "reps", { count: 12, repTime: 6 }),
+        rest(45),
+      ]},
+
+      { loop: 2, exercises: [
         prep("Pompki"),
         ex("Pompki", "reps", { count: 10, repTime: 4 }, { confirm: true }),
         rest(45),
       ]},
 
-      { loop: 5, exercises: [
-        prep("Wiosłowanie"),
-        ex("Wiosłowanie", "reps", { count: 10, repTime: 4 }, { confirm: true }),
+      { loop: 2, exercises: [
+        prep("Wiosłowanie na poręczach"),
+        ex("Wiosłowanie na poręczach", "reps", { count: 10, repTime: 4 }, { confirm: true }),
         rest(45),
       ]},
 
@@ -332,14 +353,22 @@ const ROUTINES = [
 
       prep("Samolot – pierwsza noga"),
       ex("Samolot – pierwsza noga", "time", 60),
-      prep("Zmień nogę", 5),
+      change("Zmień nogę"),
       ex("Samolot – druga noga", "time", 60),
 
-      { loop: 3, exercises: [
+      { loop: 2, exercises: [
         prep("Split squat"),
         ex("Split squat – pierwsza noga", "reps", { count: 15, repTime: 8 }),
-        prep("Zmień nogę", 5),
+        change("Zmień nogę"),
         ex("Split squat – druga noga", "reps", { count: 15, repTime: 8 }),
+        rest(60),
+      ]},
+
+      { loop: 2, exercises: [
+        prep("Kossack squat"),
+        ex("Kossack squat – pierwsza noga", "reps", { count: 15, repTime: 8 }),
+        change("Zmień nogę"),
+        ex("Kossack squat – druga noga", "reps", { count: 15, repTime: 8 }),
         rest(60),
       ]},
 
@@ -350,12 +379,6 @@ const ROUTINES = [
       { loop: 2, exercises: [
         prep("Ławka rzymska prosto – skłony"),
         ex("Ławka rzymska prosto – skłony", "reps", { count: 12, repTime: 6 }),
-        rest(45),
-      ]},
-
-      { loop: 2, exercises: [
-        prep("Ławka rzymska bokiem"),
-        ex("Ławka rzymska bokiem", "reps", { count: 12, repTime: 6 }),
         rest(45),
       ]},
 
@@ -385,7 +408,7 @@ const ROUTINES = [
       { loop: 2, exercises: [
         prep("Otwieranie dłoni – pierwsza ręka"),
         ex("Otwieranie dłoni ze sztangielką – pierwsza ręka", "reps", { count: 10, repTime: 9 }),
-        prep("Zmień rękę", 5),
+        change("Zmień rękę"),
         ex("Otwieranie dłoni ze sztangielką – druga ręka", "reps", { count: 10, repTime: 9 }),
         rest(45),
       ]},
@@ -404,12 +427,12 @@ const ROUTINES = [
         ex("Siad 90/90 – unieś stopę", "time", 30),
         ex("Siad 90/90 – kolano do góry", "time", 30),
         ex("Połóż się – noga równolegle do podłogi", "time", 30),
-        prep("Zmień stronę", 5),
+        change("Zmień stronę"),
       ]},
 
       prep("Step down"),
       ex("Step down – pierwsza noga", "reps", { count: 15, repTime: 4 }),
-      prep("Zmień nogę", 5),
+      change("Zmień nogę"),
       ex("Step down – druga noga", "reps", { count: 15, repTime: 4 }),
       rest(45),
 
@@ -430,7 +453,7 @@ const ROUTINES = [
       prep("Rozciąganie pośladków o ścianę"),
       ex("Rozciąganie pośladków w oparciu o ścianę", "time", 120),
 
-      prep("Rozciąganie nogi taśmą"),
+      prep("Rozciąganie nogi – taśma tylna"),
       ex("Rozciąganie nogi – taśma tylna", "time", 120),
 
       prep("Naleśnik stojący – skłony"),
@@ -453,9 +476,9 @@ const ROUTINES = [
 
       // 4 rundy: 4min szybko + 4min wolno
       { loop: 4, exercises: [
-        prep("Szybko – max wysiłek!", 5),
+        change("Szybko – max wysiłek!"),
         ex("Airbike – szybko", "time", 240, { color: "#c0392b" }),
-        prep("Wolno – aktywny odpoczynek", 5),
+        change("Wolno – aktywny odpoczynek"),
         ex("Airbike – wolno", "time", 240, { color: "#2980b9" }),
       ]},
 
@@ -704,7 +727,14 @@ function runExercise() {
   clearInterval(timer);
   waitingConfirm = false;
   exerciseStartedInteraction = false;
-  hideBars();
+
+  // Don't force-hide bars; just reset the auto-hide timer.
+  // If bars are visible (user interaction), they stay for BARS_HIDE_DELAY.
+  // If already hidden, nothing changes.
+  clearTimeout(barsHideTimeout);
+  if (!isPaused) {
+    barsHideTimeout = setTimeout(hideBars, BARS_HIDE_DELAY);
+  }
 
   const ex = flatExercises[currentIndex];
   if (!ex) { finishRoutine(); return; }
@@ -725,7 +755,12 @@ function runExercise() {
   }
 
   // TTS
-  speak(ex.tts);
+  let ttsText = ex.tts;
+  if (ex.speakNext) {
+    const nextName = getNextExerciseName();
+    if (nextName) ttsText += `. Następne: ${nextName}`;
+  }
+  speak(ttsText);
 
   if (ex.type === 'time') {
     startTimeExercise(ex);
@@ -737,10 +772,18 @@ function runExercise() {
 }
 
 // ── TIME exercise ──
+function getNextExerciseName() {
+  if (currentIndex + 1 < flatExercises.length) {
+    return flatExercises[currentIndex + 1].name;
+  }
+  return null;
+}
+
 function startTimeExercise(ex) {
   currentTime = ex.value;
   $exMain.textContent = fmtTime(currentTime);
-  $exSub.textContent = 'sekund';
+  const nextName = getNextExerciseName();
+  $exSub.textContent = nextName ? `następne: ${nextName}` : '';
 
   timer = setInterval(() => {
     if (isPaused) return;
