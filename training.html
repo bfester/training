@@ -295,6 +295,9 @@ const ROUTINES = [
   {
     name: "Plecy",
     exercises: [
+      prep("Rozciąganie"),
+      ex("Rozciąganie", "time", 300, { confirm: true }),
+
       prep("Rolowanie pleców"),
       ex("Rolowanie pleców", "time", 120),
 
@@ -382,9 +385,9 @@ const ROUTINES = [
         rest(45),
       ]},
 
-      { loop: 3, exercises: [
+      { loop: 2, exercises: [
         prep("Wyciskanie sztangi na ławce"),
-        ex("Wyciskanie sztangi na ławce", "reps", { count: 10, repTime: 4 }, { confirm: true }),
+        ex("Wyciskanie sztangi na ławce", "reps", { count: 15, repTime: 4 }, { confirm: true }),
         rest(90),
       ]},
 
@@ -413,15 +416,6 @@ const ROUTINES = [
         rest(45),
       ]},
 
-      prep("Rozciąganie"),
-      ex("Rozciąganie", "time", 300, { confirm: true }),
-
-      prep("Wałkowanie łydek"),
-      ex("Wałkowanie łydek", "time", 120),
-
-      prep("Rolowanie pleców"),
-      ex("Rolowanie pleców", "time", 120),
-
       { loop: 4, exercises: [
         prep("Siad 90/90"),
         ex("Siad 90/90 – unieś stopę", "time", 30),
@@ -437,11 +431,12 @@ const ROUTINES = [
       rest(45),
 
       { loop: 3, exercises: [
+        prep("Rozciąganie pośladków o ścianę"),
+        ex("Rozciąganie pośladków w oparciu o ścianę", "time", 120),
         prep("Przysiady"),
         ex("Przysiady", "reps", { count: 10, repTime: 4 }),
         prep("Przejdź do psa z głową w dół", 15),
         ex("Pies z głową w dół", "time", 45),
-        rest(45),
       ]},
 
       prep("Unoszenie nogi – zginacz biodra"),
@@ -449,9 +444,6 @@ const ROUTINES = [
 
       prep("Rozciąganie kanapowe"),
       ex("Rozciąganie kanapowe", "time", 120),
-
-      prep("Rozciąganie pośladków o ścianę"),
-      ex("Rozciąganie pośladków w oparciu o ścianę", "time", 120),
 
       prep("Rozciąganie nogi – taśma tylna"),
       ex("Rozciąganie nogi – taśma tylna", "time", 120),
@@ -468,21 +460,16 @@ const ROUTINES = [
   },
 
   {
-    name: "Airbike 4×4",
+    name: "Airbike 4x4",
     exercises: [
-      // Rozgrzewka 4min
-      prep("Rozgrzewka na airbike"),
+      prep("Rozgrzewka"),
       ex("Rozgrzewka", "time", 240),
 
-      // 4 rundy: 4min szybko + 4min wolno
-      { loop: 4, exercises: [
-        change("Szybko – max wysiłek!"),
-        ex("Airbike – szybko", "time", 240, { color: "#c0392b" }),
-        change("Wolno – aktywny odpoczynek"),
-        ex("Airbike – wolno", "time", 240, { color: "#2980b9" }),
+      { loop: 2, exercises: [
+        ex("Szybko", "time", 240, { color: "#c0392b" }),
+        ex("Wolno", "time", 240, { color: "#2980b9" }),
       ]},
 
-      // Cooldown 4min
       prep("Cooldown"),
       ex("Cooldown", "time", 240, { color: "#27ae60" }),
     ]
