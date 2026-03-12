@@ -337,6 +337,12 @@ const ROUTINES = [
         rest(45),
       ]},
 
+      prep("Step down"),
+      ex("Step down – pierwsza noga", "reps", { count: 15, repTime: 4 }),
+      change("Zmień nogę"),
+      ex("Step down – druga noga", "reps", { count: 15, repTime: 4 }),
+      rest(45),
+
       { loop: 2, exercises: [
         prep("Wiosłowanie na poręczach"),
         ex("Wiosłowanie na poręczach", "reps", { count: 10, repTime: 4 }, { confirm: true }),
@@ -391,6 +397,12 @@ const ROUTINES = [
         rest(90),
       ]},
 
+      { loop: 1, exercises: [
+        prep("Podciąganie"),
+        ex("Podciąganie", "reps", { count: 10, repTime: 6 }, { confirm: true }),
+        rest(90),
+      ]},
+
       { loop: 3, exercises: [
         prep("Zwisy"),
         ex("Zwisy", "time", 30),
@@ -405,8 +417,16 @@ const ROUTINES = [
   {
     name: "Mobility",
     exercises: [
-      prep("Rice bucket"),
-      ex("Rice bucket", "time", 300),
+      prep("Airbike - Rozgrzewka"),
+      ex("Airbike - Rozgrzewka", "time", 240),
+      { loop: 4, exercises: [
+        ex("Airbike - Szybko", "time", 60, { color: "#c0392b" }),
+        ex("Airbike - Wolno", "time", 60, { color: "#2980b9" }),
+      ]},
+      ex("Airbike - Cooldown", "time", 180, { color: "#27ae60" }),
+
+      // prep("Rice bucket"),
+      // ex("Rice bucket", "time", 300),
 
       { loop: 2, exercises: [
         prep("Otwieranie dłoni – pierwsza ręka"),
@@ -424,22 +444,16 @@ const ROUTINES = [
         change("Zmień stronę"),
       ]},
 
-      prep("Step down"),
-      ex("Step down – pierwsza noga", "reps", { count: 15, repTime: 4 }),
-      change("Zmień nogę"),
-      ex("Step down – druga noga", "reps", { count: 15, repTime: 4 }),
-      rest(45),
-
       { loop: 3, exercises: [
-        prep("Rozciąganie pośladków o ścianę"),
+        prep("Rozciąganie pośladków w oparciu o ścianę"),
         ex("Rozciąganie pośladków w oparciu o ścianę", "time", 120),
         prep("Przysiady"),
-        ex("Przysiady", "reps", { count: 10, repTime: 4 }),
+        ex("Przysiady", "reps", { count: 15, repTime: 6 }),
         prep("Przejdź do psa z głową w dół", 15),
         ex("Pies z głową w dół", "time", 45),
       ]},
 
-      prep("Unoszenie nogi – zginacz biodra"),
+      prep("Unoszenie nogi z taśmą – zginacz biodra"),
       ex("Unoszenie nogi z taśmą – zginacz biodra", "time", 120),
 
       prep("Rozciąganie kanapowe"),
@@ -454,26 +468,16 @@ const ROUTINES = [
       prep("Naleśnik siedzący"),
       ex("Naleśnik siedzący", "time", 120),
 
+      { loop: 3, exercises: [
+        prep("Zwisy"),
+        ex("Zwisy", "time", 30),
+        rest(90),
+      ]},
+
       prep("Siad"),
       ex("Siad", "time", 120),
     ]
-  },
-
-  {
-    name: "Airbike 4x4",
-    exercises: [
-      prep("Rozgrzewka"),
-      ex("Rozgrzewka", "time", 240),
-
-      { loop: 2, exercises: [
-        ex("Szybko", "time", 240, { color: "#c0392b" }),
-        ex("Wolno", "time", 240, { color: "#2980b9" }),
-      ]},
-
-      prep("Cooldown"),
-      ex("Cooldown", "time", 240, { color: "#27ae60" }),
-    ]
-  },
+  }
 ];
 
 // ══════════════════════════════════════════════════════════════
