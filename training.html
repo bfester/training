@@ -295,9 +295,6 @@ const ROUTINES = [
   {
     name: "Plecy",
     exercises: [
-      prep("Rozciąganie"),
-      ex("Rozciąganie", "time", 300, { confirm: true }),
-
       prep("Rolowanie pleców"),
       ex("Rolowanie pleców", "time", 120),
 
@@ -397,15 +394,15 @@ const ROUTINES = [
         rest(90),
       ]},
 
-      { loop: 1, exercises: [
-        prep("Podciąganie"),
-        ex("Podciąganie", "reps", { count: 10, repTime: 6 }, { confirm: true }),
-        rest(90),
-      ]},
-
       { loop: 3, exercises: [
         prep("Zwisy"),
         ex("Zwisy", "time", 30),
+        rest(90),
+      ]},
+
+      { loop: 1, exercises: [
+        prep("Podciąganie"),
+        ex("Podciąganie", "reps", { count: 10, repTime: 6 }, { confirm: true }),
         rest(90),
       ]},
 
